@@ -15,8 +15,12 @@ import java.util.List;
 @RequestMapping("/keycloack")
 public class KeyCloakController {
 
+
+    final KeycloackService keycloackService;
     @Autowired
-    KeycloackService keycloackService;
+    public KeyCloakController(KeycloackService keycloackService) {
+        this.keycloackService = keycloackService;
+    }
 
     @GetMapping("/{realmName}/usuarios")
     public List<UserRepresentation> buscarUsuariosPorRealm(@PathVariable String realmName) {
