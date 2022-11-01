@@ -4,10 +4,7 @@ import br.mil.ccarj.controle.acesso.services.KeycloackService;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -17,14 +14,30 @@ public class KeyCloakController {
 
 
     final KeycloackService keycloackService;
+
     @Autowired
     public KeyCloakController(KeycloackService keycloackService) {
         this.keycloackService = keycloackService;
     }
 
     @GetMapping("/{realmName}/usuarios")
-    public List<UserRepresentation> buscarUsuariosPorRealm(@PathVariable String realmName) {
-        return keycloackService.buscarUsuariosDoRealm(realmName);
+    public List<UserRepresentation> buscarUsuariosPorRealm(@PathVariable String realmName,
+                                                           @RequestParam(required = false) String userName,
+                                                           @RequestParam(required = false) String firstName,
+                                                           @RequestParam(required = false) String lastName,
+                                                           @RequestParam(required = false) String email,
+                                                           @RequestParam(required = false) Integer first,
+                                                           @RequestParam(required = false) Integer max) {
+        return keycloackService
+                .buscarUsuariosDoRealm(
+                        realmName,
+                        userName,
+                        firstName,
+                        lastName,
+                        email,
+                        first,
+                        max
+                );
     }
 
     @GetMapping("/{realmName}/usuarios/{userId}/roles")

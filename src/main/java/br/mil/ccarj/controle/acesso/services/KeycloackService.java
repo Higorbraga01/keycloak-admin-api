@@ -18,14 +18,14 @@ public class KeycloackService {
         this.keycloak = keycloak;
     }
 
-    public List<UserRepresentation> buscarUsuariosDoRealm(String realmName) {
+    public List<UserRepresentation> buscarUsuariosDoRealm(String realmName, String userName, String firstName, String lastName, String email, Integer first, Integer max) {
         return keycloak
                 .realm(realmName)
                 .users()
-                .list();
+                .search(userName, firstName, lastName, email, first, max);
     }
 
-    public List<RoleRepresentation> buscarRolesUsuario(String realmName, String userId){
+    public List<RoleRepresentation> buscarRolesUsuario(String realmName, String userId) {
         return keycloak
                 .realm(realmName)
                 .users()
