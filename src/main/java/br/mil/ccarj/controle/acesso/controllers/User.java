@@ -1,7 +1,6 @@
 package br.mil.ccarj.controle.acesso.controllers;
 
 import br.mil.ccarj.controle.acesso.services.KeycloackService;
-import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -9,18 +8,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/keycloack")
-public class KeyCloakController {
-
+@RequestMapping("/user")
+public class User {
 
     final KeycloackService keycloackService;
 
     @Autowired
-    public KeyCloakController(KeycloackService keycloackService) {
+    public User(KeycloackService keycloackService) {
         this.keycloackService = keycloackService;
     }
 
-    @GetMapping("/{realmName}/usuarios")
+    @GetMapping("/realm/{realmName}")
     public List<UserRepresentation> buscarUsuariosPorRealm(@PathVariable String realmName,
                                                            @RequestParam(required = false) String userName,
                                                            @RequestParam(required = false) String firstName,
@@ -29,7 +27,7 @@ public class KeyCloakController {
                                                            @RequestParam(required = false) Integer first,
                                                            @RequestParam(required = false) Integer max) {
         return keycloackService
-                .buscarUsuariosDoRealm(
+                .findUsersRealm(
                         realmName,
                         userName,
                         firstName,
@@ -40,9 +38,8 @@ public class KeyCloakController {
                 );
     }
 
-    @GetMapping("/{realmName}/usuarios/{userId}/roles")
-    public List<RoleRepresentation> buscarRolesUsuario(@PathVariable String realmName, @PathVariable String userId) {
-        return keycloackService.buscarRolesUsuario(realmName, userId);
+    @GetMapping("/realm/{realmName}/user/{id}")
+    public UserRepresentation buscarUsuario(@PathVariable String realmName, @PathVariable String id) {
+        return keycloackService.findUserId(realmName, id);
     }
-
 }
