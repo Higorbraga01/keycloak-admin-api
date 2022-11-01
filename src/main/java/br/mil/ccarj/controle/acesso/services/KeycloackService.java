@@ -35,13 +35,20 @@ public class KeycloackService {
 
     }
 
-
     public List<RoleRepresentation> findAllRealmRoles(String realmName) {
         return keycloak.realm(realmName).roles().list();
     }
 
+    public List<RoleRepresentation> findUserAvaliabeRealmRoles(String realmName, String userId) {
+        return keycloak.realm(realmName).users().get(userId).roles().realmLevel().listAvailable();
+    }
+
+    public List<RoleRepresentation> findUserAvaliabeClientRoles(String realmName, String userId, String clientId) {
+        return keycloak.realm(realmName).users().get(userId).roles().clientLevel(clientId).listAvailable();
+    }
+
     public List<RoleRepresentation> findUserRealmRoles(String realmName, String userId) {
-        return keycloak.realm(realmName).users().get(userId).roles().getAll().getRealmMappings();
+        return keycloak.realm(realmName).users().get(userId).roles().realmLevel().listAll();
     }
 
     public List<RoleRepresentation> findUserClientRoles(String realmName, String userId, String clientId) {

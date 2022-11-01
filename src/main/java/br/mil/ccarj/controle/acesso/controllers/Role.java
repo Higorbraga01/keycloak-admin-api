@@ -36,4 +36,14 @@ public class Role {
         return keycloackService.findUserClientRoles(realmName, userId, clientId);
     }
 
+    @GetMapping("/avaliable/realm/{realmName}/user/{userId}")
+    public List<RoleRepresentation> buscarRolesDisponiveisUsuarioRealm(@PathVariable String realmName, @PathVariable String userId) {
+        return keycloackService.findUserAvaliabeRealmRoles(realmName, userId);
+    }
+
+    @GetMapping("/avaliable/realm/{realmName}/user/{userId}/client/{clientId}")
+    public List<RoleRepresentation> buscarRolesDisponiveisUsuarioClient(@PathVariable String realmName, @PathVariable String userId, @PathVariable String clientId) {
+        return keycloackService.findUserAvaliabeClientRoles(realmName, userId, clientId);
+    }
+
 }
