@@ -55,5 +55,12 @@ public class KeycloackService {
         return keycloak.realm(realmName).users().get(userId).roles().clientLevel(clientId).listAll();
     }
 
+    public void addRealmRoleMappingUser(String realmName, String userId, List<RoleRepresentation> roles) {
+        keycloak.realm(realmName).users().get(userId).roles().realmLevel().add(roles);
+    }
+
+    public void removeRealmRoleMappingUser(String realmName, String userId, List<RoleRepresentation> roles) {
+        keycloak.realm(realmName).users().get(userId).roles().realmLevel().remove(roles);
+    }
 
 }
