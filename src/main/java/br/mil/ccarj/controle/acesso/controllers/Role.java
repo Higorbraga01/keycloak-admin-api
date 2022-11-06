@@ -53,4 +53,22 @@ public class Role {
         keycloackService.removeRealmRoleMappingUser(realmName, userId, roles);
     }
 
+    @PostMapping("/realm/{realmName}/user/{userId}/client/{clientId}")
+    public void adicionarClientRolesUser(
+            @PathVariable String realmName,
+            @PathVariable String userId,
+            @PathVariable String clientId,
+            @RequestBody List<RoleRepresentation> roles) {
+        keycloackService.addClientRoleMappingUser(realmName, userId, clientId, roles);
+    }
+
+    @DeleteMapping("/realm/{realmName}/user/{userId}/client/{clientId}")
+    public void removerClientRolesUser(
+            @PathVariable String realmName,
+            @PathVariable String userId,
+            @PathVariable String clientId,
+            @RequestBody List<RoleRepresentation> roles) {
+        keycloackService.removeClientRoleMappingUser(realmName, userId, clientId, roles);
+    }
+
 }

@@ -1,6 +1,7 @@
 package br.mil.ccarj.controle.acesso.services;
 
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.idm.ClientRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,18 @@ public class KeycloackService {
 
     public void removeRealmRoleMappingUser(String realmName, String userId, List<RoleRepresentation> roles) {
         keycloak.realm(realmName).users().get(userId).roles().realmLevel().remove(roles);
+    }
+
+    public void addClientRoleMappingUser(String realmName, String userId, String clientId, List<RoleRepresentation> roles) {
+        keycloak.realm(realmName).users().get(userId).roles().clientLevel(clientId).add(roles);
+    }
+
+    public void removeClientRoleMappingUser(String realmName, String userId, String clientId, List<RoleRepresentation> roles) {
+        keycloak.realm(realmName).users().get(userId).roles().clientLevel(clientId).remove(roles);
+    }
+
+    public List<ClientRepresentation> findallRealmClients(String realmName) {
+        return keycloak.realm(realmName).clients().findAll();
     }
 
 }
