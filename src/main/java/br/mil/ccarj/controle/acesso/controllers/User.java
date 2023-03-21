@@ -38,6 +38,11 @@ public class User {
                 );
     }
 
+    @GetMapping("/realm/{realmName}/user/count")
+    public Integer contarUsuariosRealm(@PathVariable String realmName) {
+        return keycloackService.countRealmUsers(realmName);
+    }
+
     @GetMapping("/realm/{realmName}/user/{id}")
     public UserRepresentation buscarUsuario(@PathVariable String realmName, @PathVariable String id) {
         return keycloackService.findUserId(realmName, id);

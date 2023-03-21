@@ -26,6 +26,13 @@ public class KeycloackService {
                 .search(userName, firstName, lastName, email, first, max);
     }
 
+    public Integer countRealmUsers(String realmName) {
+        return keycloak
+                .realm(realmName)
+                .users()
+                .count();
+    }
+
     public UserRepresentation findUserId(String realmName, String userId) {
         return keycloak
                 .realms()

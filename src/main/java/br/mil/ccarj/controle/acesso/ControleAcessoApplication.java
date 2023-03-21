@@ -30,6 +30,25 @@ public class ControleAcessoApplication {
 
     @Bean
     public Keycloak login() {
+        return KeycloakBuilder.builder()
+                .serverUrl("https://auth.homolog.ccarj.intraer/auth")
+                .grantType(OAuth2Constants.PASSWORD)
+                .realm("master")
+                .clientId("admin-cli")
+                .username("admin")
+                .password("#ccarj#")
+                .resteasyClient(
+                        (ResteasyClient) ClientBuilder
+                                .newBuilder()
+                                .sslContext(
+                                        getSslContext()
+                                )
+                                .hostnameVerifier(new NoopHostnameVerifier())
+                                .build()
+                ).build();
+    }
+
+    private SSLContext getSslContext() {
         // load the certificate
         File file = new File("keycloak");
         InputStream fis = null;
@@ -57,19 +76,7 @@ public class ControleAcessoApplication {
                  KeyStoreException e) {
             throw new RuntimeException(e);
         }
-        return KeycloakBuilder.builder()
-                .serverUrl("https://auth.homolog.ccarj.intraer/auth")
-                .grantType(OAuth2Constants.PASSWORD)
-                .realm("master")
-                .clientId("admin-cli")
-                .username("admin")
-                .password("#ccarj#")
-                .resteasyClient(
-                        (ResteasyClient) ClientBuilder
-                                .newBuilder()
-                                .sslContext(ctx).hostnameVerifier(new NoopHostnameVerifier())
-                                .build()
-                ).build();
+        return ctx;
     }
 
 }
