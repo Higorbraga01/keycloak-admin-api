@@ -20,7 +20,15 @@ public class KeycloackService {
         this.keycloak = keycloak;
     }
 
-    public List<UserRepresentation> findUsersRealm(String realmName, String userName, String firstName, String lastName, String email, Integer first, Integer max) {
+    public List<UserRepresentation> findUsersRealm(
+            String realmName,
+            String userName,
+            String firstName,
+            String lastName,
+            String email,
+            Integer first,
+            Integer max
+    ) {
         return keycloak
                 .realm(realmName)
                 .users()
@@ -166,6 +174,18 @@ public class KeycloackService {
                 .users()
                 .get(userId)
                 .groups();
+    }
+
+    public List<GroupRepresentation> findUserRealmGroups(String realmName,
+                                                         String userId,
+                                                         String search,
+                                                         Integer first,
+                                                         Integer max) {
+        return keycloak
+                .realm(realmName)
+                .users()
+                .get(userId)
+                .groups(search, first, max);
     }
     public void addRealmGroupUser(String realmName, String userId, String groupId){
         keycloak

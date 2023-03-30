@@ -28,7 +28,6 @@ public class User {
                                                            @RequestParam(required = false) String email,
                                                            @RequestParam(required = false) Integer first,
                                                            @RequestParam(required = false) Integer max) {
-        System.out.println("first:"+first +" max:"+ max);
         return keycloackService
                 .findUsersRealm(
                         realmName,
@@ -54,6 +53,15 @@ public class User {
     @GetMapping("/realm/{realmName}/user/{id}/groups")
     public List<GroupRepresentation> buscarGruposDoUsuario(@PathVariable String realmName, @PathVariable String id) {
         return keycloackService.findUserRealmGroups(realmName, id);
+    }
+
+    @GetMapping("/realm/{realmName}/user/{id}/groups/{search}")
+    public List<GroupRepresentation> buscarGruposDoUsuarioProGrupo(
+            @PathVariable String realmName, @PathVariable String id,
+            @PathVariable String search,
+            @RequestParam(required = false, defaultValue = "0") Integer first,
+            @RequestParam(required = false, defaultValue = "20") Integer max) {
+        return keycloackService.findUserRealmGroups(realmName, id, search, first, max);
     }
 
     @PutMapping("/realm/{realmName}/user/{id}/groups/{groupId}")
