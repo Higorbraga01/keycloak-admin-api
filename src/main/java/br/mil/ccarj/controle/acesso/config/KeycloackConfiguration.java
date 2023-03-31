@@ -8,6 +8,9 @@ import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.util.ResourceUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -24,11 +27,20 @@ import java.security.cert.CertificateFactory;
 @Configuration
 public class KeycloackConfiguration {
 
+
+    final KeycloakConfigurationProperties keycloakInitializerConfigurationProperties;
+
+
+    private final ResourceLoader resourceLoader;
+
     @Autowired
-    KeycloakConfigurationProperties keycloakInitializerConfigurationProperties;
+    public KeycloackConfiguration(KeycloakConfigurationProperties keycloakInitializerConfigurationProperties, ResourceLoader resourceLoader) {
+        this.keycloakInitializerConfigurationProperties = keycloakInitializerConfigurationProperties;
+        this.resourceLoader = resourceLoader;
+    }
 
     @Bean
-    protected Keycloak keycloak() {
+    protected Keycloak keycloak() throws IOException {
         return KeycloakBuilder.builder()
                 .grantType(OAuth2Constants.PASSWORD)
                 .realm(keycloakInitializerConfigurationProperties.getRealm())
@@ -50,17 +62,21 @@ public class KeycloackConfiguration {
 
 
 
-    private SSLContext getSslContext() {
+    private SSLContext getSslContext() throws IOException {
         // load the certificate
-        File file = new File("keycloak");
-        InputStream fis = null;
+        Resource resource = resourceLoader.getResource(
+                ResourceUtils.CLASSPATH_URL_PREFIX
+                        .concat("static/keycloak")
+        );
+        File file = new File(resource.getFile().getAbsolutePath());
+        InputStream fis;
         try {
             fis = new FileInputStream(file.getAbsolutePath());
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        CertificateFactory cf = null;
-        SSLContext ctx = null;
+        CertificateFactory cf;
+        SSLContext ctx;
         try {
             cf = CertificateFactory.getInstance("X.509");
 
