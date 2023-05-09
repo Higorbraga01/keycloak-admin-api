@@ -8,6 +8,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -200,6 +201,27 @@ public class KeycloackService {
                 .users()
                 .get(userId)
                 .leaveGroup(groupId);
+    }
+
+    public List<UserRepresentation> findGroupMembers(String realmName, String groupId) {
+        int first = 0;
+        int max = 100;
+        boolean continuar = true;
+        List<UserRepresentation> groupMembers =new ArrayList<>();
+        while (continuar) {
+            List<UserRepresentation> current = keycloak
+                    .realm(realmName)
+                    .groups()
+                    .group(groupId)
+                    .members(first, max);
+            groupMembers.addAll(current);
+            first += max;
+            max += max;
+            if (current.isEmpty()){
+                continuar = false;
+            }
+        }
+        return groupMembers;
     }
 
 }
