@@ -1,6 +1,6 @@
 package br.mil.ccarj.controle.acesso.controllers;
 
-import br.mil.ccarj.controle.acesso.models.Group;
+import br.mil.ccarj.controle.acesso.models.GrupoPerfil;
 import br.mil.ccarj.controle.acesso.services.KeycloackService;
 import br.mil.ccarj.controle.acesso.services.RelatorioService;
 import org.keycloak.representations.idm.GroupRepresentation;
@@ -40,9 +40,9 @@ public class GroupController {
     }
 
     @PostMapping(value = "/realm/{realmName}/groups/members", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    public byte[] gerarRelatorioDeUsuariosPorGrupo(HttpServletResponse response,@PathVariable String realmName, @RequestBody List<Group> groups) {
+    public byte[] gerarRelatorioDeUsuariosPorGrupo(HttpServletResponse response,@PathVariable String realmName, @RequestBody List<GrupoPerfil> grupoPerfilList) {
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=USUARIOS_SISPLAER_POR_PERFIS.xlsx");
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        return relatorioService.generateFile(realmName, groups);
+        return relatorioService.generateFile(realmName, grupoPerfilList);
     }
 }

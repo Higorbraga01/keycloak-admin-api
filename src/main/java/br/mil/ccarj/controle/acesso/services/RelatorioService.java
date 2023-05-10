@@ -1,6 +1,6 @@
 package br.mil.ccarj.controle.acesso.services;
 
-import br.mil.ccarj.controle.acesso.models.Group;
+import br.mil.ccarj.controle.acesso.models.GrupoPerfil;
 import br.mil.ccarj.controle.acesso.models.enums.Perfil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
@@ -39,14 +39,14 @@ public class RelatorioService {
     private List<UserRepresentation> listGerentUGR = new ArrayList<>();
     private List<List<UserRepresentation>> groupMembers = new ArrayList<>();
 
-    public byte[] generateFile(String realmName, List<Group> groups) {
+    public byte[] generateFile(String realmName, List<GrupoPerfil> sisplaerGruposPerfis) {
         this.workbook = new XSSFWorkbook();
-        buscarUsuariosPorGrupo(realmName, groups);
+        buscarUsuariosPorGrupo(realmName, sisplaerGruposPerfis);
 
         try {
             int index = 1;
             for (List<UserRepresentation> users : groupMembers) {
-                if (!users.isEmpty() && index <= groups.size()) {
+                if (!users.isEmpty() && index <= sisplaerGruposPerfis.size()) {
                     Perfil perfil = Perfil.forInt(index);
                     writeHeaderLine(perfil.getNome());
                     writeDataLines(users);
@@ -63,31 +63,31 @@ public class RelatorioService {
         }
     }
 
-    private void buscarUsuariosPorGrupo(String realmName, List<Group> groups) {
-        for (Group group : groups) {
-            if (group.getName().equals("Sisplaer Admin")) {
-                listSispAdmin.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
+    private void buscarUsuariosPorGrupo(String realmName, List<GrupoPerfil> grupoPerfils) {
+        for (GrupoPerfil grupoPerfil : grupoPerfils) {
+            if (grupoPerfil.getName().equals("Sisplaer Admin")) {
+                listSispAdmin.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
-            if (group.getName().equals("Sisplaer Cadastro Basico")) {
-                listCadastBas.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
+            if (grupoPerfil.getName().equals("Sisplaer Cadastro Basico")) {
+                listCadastBas.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
-            if (group.getName().equals("Sisplaer Gerente AO")) {
-                listGerentAO.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
+            if (grupoPerfil.getName().equals("Sisplaer Gerente AO")) {
+                listGerentAO.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
-            if (group.getName().equals("Sisplaer Gerente ODS")) {
-                listGerentODS.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
+            if (grupoPerfil.getName().equals("Sisplaer Gerente ODS")) {
+                listGerentODS.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
-            if (group.getName().equals("Sisplaer Gerente ODS AO 2000")) {
-                listGerentODSAO2000.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
+            if (grupoPerfil.getName().equals("Sisplaer Gerente ODS AO 2000")) {
+                listGerentODSAO2000.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
-            if (group.getName().equals("Sisplaer Gerente ODS UGR")) {
-                listGerentODS_UGR.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
+            if (grupoPerfil.getName().equals("Sisplaer Gerente ODS UGR")) {
+                listGerentODS_UGR.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
-            if (group.getName().equals("Sisplaer Gerente PO")) {
-                listGerentPO.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
+            if (grupoPerfil.getName().equals("Sisplaer Gerente PO")) {
+                listGerentPO.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
-            if (group.getName().equals("Sisplaer Gerente UGR")) {
-                listGerentUGR.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
+            if (grupoPerfil.getName().equals("Sisplaer Gerente UGR")) {
+                listGerentUGR.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
         }
         groupMembers.add(listSispAdmin);
