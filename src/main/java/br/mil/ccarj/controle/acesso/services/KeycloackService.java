@@ -207,16 +207,16 @@ public class KeycloackService {
         int first = 0;
         int max = 100;
         boolean continuar = true;
-        List<UserRepresentation> groupMembers =new ArrayList<>();
+        List<UserRepresentation> groupMembers = new ArrayList<>();
         while (continuar) {
             List<UserRepresentation> current = keycloak
                     .realm(realmName)
                     .groups()
                     .group(groupId)
                     .members(first, max);
+            first += max;
             if(!current.isEmpty()){
                 groupMembers.addAll(current);
-                first += max;
                 max += max;
             } else {
                 continuar = false;
