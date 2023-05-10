@@ -1,25 +1,26 @@
 package br.mil.ccarj.controle.acesso.controllers;
 
+import br.mil.ccarj.controle.acesso.models.Group;
 import br.mil.ccarj.controle.acesso.services.KeycloackService;
 import br.mil.ccarj.controle.acesso.services.RelatorioService;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @RestController
 @RequestMapping("/group")
-public class Group {
+public class GroupController {
 
     private final KeycloackService service;
     private final RelatorioService relatorioService;
 
     @Autowired
-    public Group(KeycloackService service, RelatorioService relatorioService) {
+    public GroupController(KeycloackService service, RelatorioService relatorioService) {
         this.service = service;
         this.relatorioService = relatorioService;
     }
@@ -34,7 +35,14 @@ public class Group {
         return service.findRealmGroupsById(realmName, groupId);
     }
     @GetMapping("/realm/{realmName}/groups/{groupId}/members")
-    public void gerarRelatorioDeUsuariosPorGrupo(@PathVariable String realmName, @PathVariable String groupId) {
-        this.relatorioService.generateFile();
+    public List<UserRepresentation> gerarRelatorioDeUsuariosPorGrupo(@PathVariable String realmName, @PathVariable String groupId) {
+        return service.findGroupMembers(realmName,groupId);
+    }
+
+    @PostMapping(value = "/realm/{realmName}/groups/members", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    public byte[] gerarRelatorioDeUsuariosPorGrupo(HttpServletResponse response,@PathVariable String realmName, @RequestBody List<Group> groups) {
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=USUARIOS_SISPLAER_POR_PERFIS.xlsx");
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        return relatorioService.generateFile(realmName, groups);
     }
 }

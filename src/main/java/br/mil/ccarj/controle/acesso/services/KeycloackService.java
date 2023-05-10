@@ -214,10 +214,11 @@ public class KeycloackService {
                     .groups()
                     .group(groupId)
                     .members(first, max);
-            groupMembers.addAll(current);
-            first += max;
-            max += max;
-            if (current.isEmpty()){
+            if(!current.isEmpty()){
+                groupMembers.addAll(current);
+                first += max;
+                max += max;
+            } else {
                 continuar = false;
             }
         }

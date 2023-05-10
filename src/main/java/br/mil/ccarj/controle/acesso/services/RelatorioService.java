@@ -12,9 +12,8 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -40,7 +39,7 @@ public class RelatorioService {
     private List<UserRepresentation> listGerentUGR = new ArrayList<>();
     private List<List<UserRepresentation>> groupMembers = new ArrayList<>();
 
-    public void generateFile(String realmName, List<Group> groups) {
+    public byte[] generateFile(String realmName, List<Group> groups) {
         this.workbook = new XSSFWorkbook();
         buscarUsuariosPorGrupo(realmName, groups);
 
@@ -54,10 +53,11 @@ public class RelatorioService {
                     index++;
                 }
             }
-            String userDirectory = Paths.get("")
-                    .toAbsolutePath()
-                    .toString();
-            this.workbook.write(new FileOutputStream(userDirectory + "/export/USUARIOS_SISPLAER_POR_PERFIS.xlsx"));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            this.workbook.write(out);
+            this.workbook.close();
+            System.out.println("relatorio gerado com sucesso");
+            return out.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -66,28 +66,28 @@ public class RelatorioService {
     private void buscarUsuariosPorGrupo(String realmName, List<Group> groups) {
         for (Group group : groups) {
             if (group.getName().equals("Sisplaer Admin")) {
-                listSispAdmin = keycloackService.findGroupMembers(realmName, group.getId());
+                listSispAdmin.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
             }
             if (group.getName().equals("Sisplaer Cadastro Basico")) {
-                listCadastBas = keycloackService.findGroupMembers(realmName, group.getId());
+                listCadastBas.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
             }
             if (group.getName().equals("Sisplaer Gerente AO")) {
-                listGerentAO = keycloackService.findGroupMembers(realmName, group.getId());
+                listGerentAO.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
             }
             if (group.getName().equals("Sisplaer Gerente ODS")) {
-                listGerentODS = keycloackService.findGroupMembers(realmName, group.getId());
+                listGerentODS.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
             }
             if (group.getName().equals("Sisplaer Gerente ODS AO 2000")) {
-                listGerentODSAO2000 = keycloackService.findGroupMembers(realmName, group.getId());
+                listGerentODSAO2000.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
             }
             if (group.getName().equals("Sisplaer Gerente ODS UGR")) {
-                listGerentODS_UGR = keycloackService.findGroupMembers(realmName, group.getId());
+                listGerentODS_UGR.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
             }
             if (group.getName().equals("Sisplaer Gerente PO")) {
-                listGerentPO = keycloackService.findGroupMembers(realmName, group.getId());
+                listGerentPO.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
             }
             if (group.getName().equals("Sisplaer Gerente UGR")) {
-                listGerentUGR =keycloackService.findGroupMembers(realmName, group.getId());
+                listGerentUGR.addAll(keycloackService.findGroupMembers(realmName, group.getId()));
             }
         }
         groupMembers.add(listSispAdmin);
