@@ -46,7 +46,7 @@ public class RelatorioService {
         try {
             int index = 1;
             for (List<UserRepresentation> users : groupMembers) {
-                if (!users.isEmpty()) {
+                if (!users.isEmpty() && index <= groups.size()) {
                     Perfil perfil = Perfil.forInt(index);
                     writeHeaderLine(perfil.getNome());
                     writeDataLines(users);
