@@ -1,7 +1,6 @@
 package br.mil.ccarj.controle.acesso.services;
 
 import br.mil.ccarj.controle.acesso.models.GrupoPerfil;
-import br.mil.ccarj.controle.acesso.models.enums.Perfil;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.CellReference;
@@ -29,30 +28,22 @@ public class RelatorioService {
     KeycloackService keycloackService;
     private XSSFWorkbook workbook;
     private XSSFSheet sheet;
-    private List<UserRepresentation> listSispAdmin = new ArrayList<>();
-    private List<UserRepresentation> listCadastBas = new ArrayList<>();
-    private List<UserRepresentation> listGerentAO = new ArrayList<>();
-    private List<UserRepresentation> listGerentODS = new ArrayList<>();
-    private List<UserRepresentation> listGerentODSAO2000 = new ArrayList<>();
-    private List<UserRepresentation> listGerentODS_UGR = new ArrayList<>();
-    private List<UserRepresentation> listGerentPO = new ArrayList<>();
-    private List<UserRepresentation> listGerentUGR = new ArrayList<>();
-    private List<List<UserRepresentation>> groupMembers = new ArrayList<>();
 
     public byte[] generateFile(String realmName, List<GrupoPerfil> sisplaerGruposPerfis) {
+        List<List<UserRepresentation>> groupMembers = new ArrayList<>();
         this.workbook = new XSSFWorkbook();
-        buscarUsuariosPorGrupo(realmName, sisplaerGruposPerfis);
+        buscarUsuariosPorGrupo(realmName, sisplaerGruposPerfis, groupMembers);
 
         try {
-            int index = 1;
-            for (List<UserRepresentation> users : groupMembers) {
-                if (!users.isEmpty() && index <= sisplaerGruposPerfis.size()) {
-                    Perfil perfil = Perfil.forInt(index);
-                    writeHeaderLine(perfil.getNome());
-                    writeDataLines(users);
-                    index++;
-                }
+            // cria o header do relatorio.
+            for (GrupoPerfil perfil: sisplaerGruposPerfis) {
+                writeHeaderLine(perfil.getName());
             }
+            // insere os dados nas planilhas.
+            for (int i = 0; i < groupMembers.size() ; i++) {
+                writeDataLines(groupMembers.get(i), i);
+            }
+
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             this.workbook.write(out);
             this.workbook.close();
@@ -63,41 +54,34 @@ public class RelatorioService {
         }
     }
 
-    private void buscarUsuariosPorGrupo(String realmName, List<GrupoPerfil> grupoPerfils) {
+    private void buscarUsuariosPorGrupo(String realmName, List<GrupoPerfil> grupoPerfils, List<List<UserRepresentation>> groupMembers) {
+
         for (GrupoPerfil grupoPerfil : grupoPerfils) {
             if (grupoPerfil.getName().equals("Sisplaer Admin")) {
-                listSispAdmin.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
+                groupMembers.add(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
             if (grupoPerfil.getName().equals("Sisplaer Cadastro Basico")) {
-                listCadastBas.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
+                groupMembers.add(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
             if (grupoPerfil.getName().equals("Sisplaer Gerente AO")) {
-                listGerentAO.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
+                groupMembers.add(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
             if (grupoPerfil.getName().equals("Sisplaer Gerente ODS")) {
-                listGerentODS.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
+                groupMembers.add(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
             if (grupoPerfil.getName().equals("Sisplaer Gerente ODS AO 2000")) {
-                listGerentODSAO2000.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
+                groupMembers.add(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
             if (grupoPerfil.getName().equals("Sisplaer Gerente ODS UGR")) {
-                listGerentODS_UGR.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
+                groupMembers.add(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
             if (grupoPerfil.getName().equals("Sisplaer Gerente PO")) {
-                listGerentPO.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
+                groupMembers.add(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
             if (grupoPerfil.getName().equals("Sisplaer Gerente UGR")) {
-                listGerentUGR.addAll(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
+                groupMembers.add(keycloackService.findGroupMembers(realmName, grupoPerfil.getId()));
             }
         }
-        groupMembers.add(listSispAdmin);
-        groupMembers.add(listCadastBas);
-        groupMembers.add(listGerentAO);
-        groupMembers.add(listGerentODS);
-        groupMembers.add(listGerentODSAO2000);
-        groupMembers.add(listGerentODS_UGR);
-        groupMembers.add(listGerentPO);
-        groupMembers.add(listGerentUGR);
     }
 
     private void writeHeaderLine(String groupName) {
@@ -122,21 +106,22 @@ public class RelatorioService {
                     .toUpperCase(Locale.ROOT)
                     .replace("SISPLAER", "PERFIL");
 
-            createCell(rowGroup,0, rowGroupHeader, rowGroupStyle);
-            createCell(row, 0, "CPF", style);
-            createCell(row, 1, "OM", style);
-            createCell(row, 2, "NOME", style);
-            createCell(row, 3, "TOTAL", style);
-            createCell(row, 4, "ATUALIZADO EM", style);
+            createCell(sheet,rowGroup,0, rowGroupHeader, rowGroupStyle);
+            createCell(sheet,row, 0, "CPF", style);
+            createCell(sheet,row, 1, "OM", style);
+            createCell(sheet,row, 2, "NOME", style);
+            createCell(sheet,row, 3, "TOTAL", style);
+            createCell(sheet,row, 4, "ATUALIZADO EM", style);
 
             sheet.addMergedRegion(CellRangeAddress.valueOf("A1:E1"));
         }
     }
 
-    private void writeDataLines(List<UserRepresentation> grupos) {
+    private void writeDataLines(List<UserRepresentation> grupos, int index) {
         int rowCount = 2;
         CellStyle style = workbook.createCellStyle();
         XSSFFont font = workbook.createFont();
+        XSSFSheet sheetAt = workbook.getSheetAt(index);
         font.setFontHeight(8);
         style.setFont(font);
         style.setBorderTop(BorderStyle.THIN);
@@ -145,16 +130,16 @@ public class RelatorioService {
         style.setBorderRight(BorderStyle.THIN);
 
         for (UserRepresentation user : grupos) {
-            Row row = sheet.createRow(rowCount++);
+            Row row = sheetAt.createRow(rowCount++);
             int columnCount = 0;
-            createCell(row, columnCount++, user.getUsername(), style);
-            createCell(row, columnCount++, user.getLastName(), style);
-            createCell(row, columnCount++, user.getFirstName(), style);
+            createCell(sheetAt, row, columnCount++, user.getUsername(), style);
+            createCell(sheetAt, row, columnCount++, user.getLastName(), style);
+            createCell(sheetAt, row, columnCount++, user.getFirstName(), style);
         }
         CellReference collumD3 = new CellReference("D3");
-        getRow(collumD3.getRow(), collumD3.getCol(), grupos.size(), style);
+        getRow(sheetAt,collumD3.getRow(), collumD3.getCol(), grupos.size(), style);
         CellReference collumE3 = new CellReference("E3");
-        getRow(
+        getRow(sheetAt,
                 collumE3.getRow(),
                 collumE3.getCol(),
                 LocalDate
@@ -167,8 +152,8 @@ public class RelatorioService {
                 style);
     }
 
-    private void createCell(Row row, int columnCount, Object value, CellStyle style) {
-        sheet.autoSizeColumn(columnCount);
+    private void createCell(Sheet sheetAt,Row row, int columnCount, Object value, CellStyle style) {
+        sheetAt.autoSizeColumn(columnCount);
         Cell cell = row.createCell(columnCount);
         if (value instanceof String) {
             cell.setCellValue((String) value);
@@ -178,9 +163,9 @@ public class RelatorioService {
         cell.setCellStyle(style);
     }
 
-    private void getRow(int row, int columnCount, Object value, CellStyle style) {
-        sheet.autoSizeColumn(columnCount);
-        Row rowFound = sheet.getRow(row);
+    private void getRow(Sheet sheetAt, int row, int columnCount, Object value, CellStyle style) {
+        sheetAt.autoSizeColumn(columnCount);
+        Row rowFound = sheetAt.getRow(row);
         assert rowFound != null;
         Cell rowFoundCell = rowFound.getCell(columnCount, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
         assert rowFoundCell != null;
