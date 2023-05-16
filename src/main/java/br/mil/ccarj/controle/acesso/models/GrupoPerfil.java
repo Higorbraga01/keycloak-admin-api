@@ -18,6 +18,8 @@ public class GrupoPerfil implements Serializable {
     private String id;
     @Column(name = "nome_grupo_perfil")
     private String name;
+    @Column(name = "nr_ordem")
+    private Integer ordem;
     @Column(name = "sistema_id")
     private String identificadorSistema;
 }

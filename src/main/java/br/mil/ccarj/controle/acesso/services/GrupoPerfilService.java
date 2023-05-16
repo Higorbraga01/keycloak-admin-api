@@ -5,8 +5,10 @@ import br.mil.ccarj.controle.acesso.repositories.GrupoPerfilRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class GrupoPerfilService {
@@ -27,7 +29,11 @@ public class GrupoPerfilService {
     }
 
     public List<GrupoPerfil> findAll() {
-        return repository.findAll();
+        return repository
+                .findAll()
+                .stream()
+                .sorted(Comparator.comparing(GrupoPerfil::getOrdem))
+                .collect(Collectors.toList());
     }
 
     public GrupoPerfil buscarPorId(String idGrupo) {
