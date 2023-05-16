@@ -205,7 +205,7 @@ public class KeycloackService {
 
     public List<UserRepresentation> findGroupMembers(String realmName, String groupId) {
         int first = 0;
-        int max = 100;
+        int max = 5;
         boolean continuar = true;
         List<UserRepresentation> groupMembers = new ArrayList<>();
         while (continuar) {
@@ -214,11 +214,11 @@ public class KeycloackService {
                     .groups()
                     .group(groupId)
                     .members(first, max);
-            first += max;
             if(!current.isEmpty()){
+                first += max;
                 groupMembers.addAll(current);
-                max += max;
             } else {
+                first=0;
                 continuar = false;
             }
         }
